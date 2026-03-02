@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from http import HTTPStatus
-from app.schemas.complaint import ComplaintCreate, ComplaintPublic
+from app.schemas.complaint import ComplaintCreate, ComplaintPublic, ComplaintStatus, ComplaintUpdate
 
 router = APIRouter()
 
@@ -30,10 +30,27 @@ def get_complaint(complaint_id: int):
 
 
 @router.put("/{complaint_id}", response_model=ComplaintPublic)
-def update_complaint(complaint_id: int, complaint: ComplaintCreate):
+def update_complaint(complaint_id: int, complaint: ComplaintUpdate):
     if complaint_id < 1 or complaint_id > len(_complaints):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Complaint not found")
-    updated = ComplaintPublic(**complaint.model_dump(), id=complaint_id)
+    existing = _complaints[complaint_id - 1]
+    # Enforce lifecycle: closed complaints cannot be updated
+    if existing.status == ComplaintStatus.closed:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Closed complaints cannot be updated")
+
+    # merge updates: only replace provided fields
+    data = existing.model_dump()
+    if complaint.title is not None:
+        data["title"] = complaint.title
+    if complaint.description is not None:
+        data["description"] = complaint.description
+
+    # handle status update if provided
+    if complaint.status is not None:
+        # cannot change status if already closed (checked above)
+        data["status"] = complaint.status
+
+    updated = ComplaintPublic(**data)
     _complaints[complaint_id - 1] = updated
     return updated
 
