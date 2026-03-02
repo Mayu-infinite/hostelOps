@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from fastapi import FastAPI, HTTPException
-from schemas import Message, UserSchema, UserPublic, UserDB, UserList
+from app.schemas.user import Message, UserSchema, UserPublic, UserDB, UserList
+from app.routers import complaints_router
 
 app = FastAPI()
 
@@ -40,3 +41,8 @@ def delete_user(user_id: int):
     del database[user_id - 1]
 
     return {"message": "User Deleted Successfully"}
+
+
+# register complaints router (implements its own paths)
+if complaints_router is not None:
+    app.include_router(complaints_router, prefix="/complaints")
