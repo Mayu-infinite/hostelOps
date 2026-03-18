@@ -18,22 +18,57 @@ import {
   UserPlus
 } from "lucide-react"
 
-export default function Dashboard() {
-  // Mock User State - Change 'role' to 'warden', 'worker', or 'admin' to test views
-  const [user] = useState({
-    name: "Mayuri Pujari",
-    role: "student", // options: student, warden, worker, admin
-    avatar: "https://github.com/shadcn.png" 
-  })
+import api from "@/lib/api"
 
-  const stats = [
-    { label: "Active Complaints", value: "3", icon: AlertCircle, color: "text-amber-500" },
-    { label: "Resolved This Month", value: "12", icon: CheckCircle2, color: "text-emerald-500" },
-    { label: "Avg. Resolution Time", value: "24h", icon: Clock, color: "text-blue-500" },
-  ]
+export default function Dashboard() {
+  const [user, setUser] = useState(null)
+  const [stats, setStats] = useState([
+    { label: "Active Complaints", value: "0", icon: AlertCircle, color: "text-amber-500" },
+    { label: "Resolved This Month", value: "0", icon: CheckCircle2, color: "text-emerald-500" },
+    { label: "Avg. Resolution Time", value: "-", icon: Clock, color: "text-blue-500" },
+  ])
+  const [recentComplaints, setRecentComplaints] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch current user
+      const userRes = await api.get("/api/v1/auth/me")
+      const userData = userRes.data
+      setUser(userData)
+
+      // Fetch complaints based on user role
+      let complaints = []
+      const endpoint = userData.role === "worker" ? "/api/v1/complaints/assigned" : "/api/v1/complaints/my"
+      const complaintsRes = await api.get(endpoint)
+      
+      complaints = Array.isArray(complaintsRes.data) ? complaintsRes.data : []
+      
+      // Only show the 2 most recent
+      setRecentComplaints(complaints.slice(0, 2))
+
+      // Calculate stats
+      const total = complaints.length
+      const resolved = complaints.filter(c => c.status === "closed").length
+      setStats([
+        { label: "Active Complaints", value: String(total - resolved), icon: AlertCircle, color: "text-amber-500" },
+        { label: "Resolved This Month", value: String(resolved), icon: CheckCircle2, color: "text-emerald-500" },
+        { label: "Avg. Resolution Time", value: "24h", icon: Clock, color: "text-blue-500" },
+      ])
+    } catch (err) {
+      console.error("Failed to load dashboard data", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Role-based navigation config
   const getRoleActions = () => {
+    if (!user) return []
     switch (user.role) {
       case "student":
         return [
@@ -64,6 +99,22 @@ export default function Dashboard() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-base-100 flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-base-100 flex items-center justify-center">
+        <p className="text-base-content/60">Failed to load dashboard. Please try again.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-base-100 p-6 lg:p-10 pt-28 space-y-8 max-w-7xl mx-auto">
 
@@ -71,22 +122,22 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="avatar">
-            <div className="w-16 rounded-full border-2 border-primary">
-              <img src={user.avatar} alt={user.name} />
+            <div className="w-16 rounded-full border-2 border-primary bg-primary text-primary-content flex items-center justify-center">
+              <span className="text-2xl font-bold">{user?.username?.[0]?.toUpperCase() || '?'}</span>
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-4xl font-bold">Dashboard</h1>
               <div className="badge badge-primary uppercase">
-                {user.role}
+                {user?.role || 'loading'}
               </div>
             </div>
-            <p className="text-base-content/60 mt-1 font-medium">Welcome back, {user.name}</p>
+            <p className="text-base-content/60 mt-1 font-medium">Welcome back, {user?.username || 'User'}</p>
           </div>
         </div>
         
-        {user.role === "student" && (
+        {user?.role === "student" && (
           <Link href="/complaints">
             <button className="btn btn-primary btn-lg gap-2">
               <PlusCircle className="w-4 h-4" />
@@ -132,25 +183,37 @@ export default function Dashboard() {
           </div>
           <div className="divider m-0"></div>
           <div className="card-body p-0">
-            {[1, 2].map((i) => (
-              <div key={i} className="p-5 flex items-center justify-between hover:bg-base-100 transition-colors border-b border-base-300 last:border-b-0">
-                <div className="flex gap-4 items-center">
-                  <div className="w-2.5 h-2.5 rounded-full bg-warning"></div>
-                  <div>
-                    <p className="font-bold text-sm">Electrical: Ceiling fan making noise in C-302</p>
-                    <p className="text-xs text-base-content/60 mt-0.5 font-medium">
-                      Status: Under Review • Filed 2h ago
-                    </p>
+            {recentComplaints.length > 0 ? (
+              <>
+                {recentComplaints.map((complaint) => (
+                  <div key={complaint.id} className="p-5 flex items-center justify-between hover:bg-base-100 transition-colors border-b border-base-300 last:border-b-0">
+                    <div className="flex gap-4 items-center flex-1">
+                      <div className={`w-2.5 h-2.5 rounded-full ${
+                        complaint.status === 'closed' ? 'bg-success' : 
+                        complaint.status === 'in_progress' ? 'bg-info' : 
+                        'bg-warning'
+                      }`}></div>
+                      <div className="flex-1">
+                        <p className="font-bold text-sm line-clamp-1">{complaint.title}</p>
+                        <p className="text-xs text-base-content/60 mt-0.5 font-medium">
+                          Status: {complaint.status.replace('_', ' ')} • {complaint.category}
+                        </p>
+                      </div>
+                    </div>
+                    <button className="btn btn-ghost btn-sm">
+                      {user?.role === 'worker' ? 'Update Status' : 'View Details'}
+                    </button>
                   </div>
-                </div>
-                <button className="btn btn-ghost btn-sm">
-                  {user.role === 'worker' ? 'Update Status' : 'View Details'}
-                </button>
+                ))}
+                <Link href="/complaints" className="flex items-center justify-center p-4 text-xs font-bold uppercase tracking-widest hover:bg-base-100 transition-colors border-t border-base-300 text-base-content/60 hover:text-primary">
+                  See All <ChevronRight className="w-4 h-4 ml-1" />
+                </Link>
+              </>
+            ) : (
+              <div className="p-5 text-center text-base-content/60">
+                No complaints yet. All systems operational!
               </div>
-            ))}
-            <Link href="/complaints" className="flex items-center justify-center p-4 text-xs font-bold uppercase tracking-widest hover:bg-base-100 transition-colors border-t border-base-300 text-base-content/60 hover:text-primary">
-              See All <ChevronRight className="w-4 h-4 ml-1" />
-            </Link>
+            )}
           </div>
         </div>
 

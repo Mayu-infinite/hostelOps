@@ -40,7 +40,7 @@ export default function Complaints() {
 
   const fetchComplaints = async () => {
     try {
-      const res = await api.get("/complaints")
+      const res = await api.get("/api/v1/complaints")
       setComplaints(res.data.complaints || []) 
     } catch (err) {
       showNotification("Failed to load complaints", "error")
@@ -51,7 +51,7 @@ export default function Complaints() {
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/complaints/${id}`)
+      await api.delete(`/api/v1/complaints/${id}`)
       showNotification("Complaint deleted successfully", "success")
       setComplaints(complaints.filter(c => c.id !== id))
     } catch (err) {

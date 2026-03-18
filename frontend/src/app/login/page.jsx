@@ -38,8 +38,11 @@ export default function AuthPage() {
         })
       }
 
-      const token = res.data.access_token
-      localStorage.setItem("token", token)
+      const { access_token, refresh_token } = res.data
+      localStorage.setItem("access_token", access_token)
+      if (refresh_token) {
+        localStorage.setItem("refresh_token", refresh_token)
+      }
       
       setSuccess(mode === "login" ? "Welcome back!" : "Account created!")
       setTimeout(() => {
@@ -62,8 +65,11 @@ export default function AuthPage() {
           id_token: credentialResponse.credential
         }
       )
-      const token = res.data.access_token
-      localStorage.setItem("token", token)
+      const { access_token, refresh_token } = res.data
+      localStorage.setItem("access_token", access_token)
+      if (refresh_token) {
+        localStorage.setItem("refresh_token", refresh_token)
+      }
       setSuccess("Login successful!")
       setTimeout(() => {
         router.push("/dashboard")

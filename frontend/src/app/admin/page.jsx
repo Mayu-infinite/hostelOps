@@ -15,7 +15,7 @@ export default function Admin() {
 
   const fetchComplaints = async () => {
     try {
-      const res = await api.get("/complaints")
+      const res = await api.get("/api/v1/complaints")
       setComplaints(res.data.complaints || res.data || [])
       setLoading(false)
     } catch (err) {
@@ -26,7 +26,7 @@ export default function Admin() {
 
   const handleMarkResolved = async (id) => {
     try {
-      await api.patch(`/complaints/${id}`, { status: "closed" })
+      await api.patch(`/api/v1/complaints/${id}`, { status: "closed" })
       showNotification("Complaint marked as resolved", "success")
       setComplaints(complaints.map(c => c.id === id ? { ...c, status: "closed" } : c))
     } catch (err) {
@@ -36,7 +36,7 @@ export default function Admin() {
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/complaints/${id}`)
+      await api.delete(`/api/v1/complaints/${id}`)
       showNotification("Complaint deleted", "success")
       setComplaints(complaints.filter(c => c.id !== id))
     } catch (err) {
