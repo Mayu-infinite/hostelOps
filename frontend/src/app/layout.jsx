@@ -1,5 +1,6 @@
 import "./globals.css"
 import { GoogleOAuthProvider } from "@react-oauth/google"
+import Navbar from "@/components/Navbar"
 
 export const metadata = {
   title: "HostelOps | IIT Jodhpur",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }) {
       <head />
       <body className="antialiased">
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+          <Navbar />
           <main>
             {children}
           </main>

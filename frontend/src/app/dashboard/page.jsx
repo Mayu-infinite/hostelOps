@@ -116,14 +116,21 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 p-6 lg:p-10 pt-28 space-y-8 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-base-100 p-6 lg:p-10 space-y-8 max-w-7xl mx-auto">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="avatar">
             <div className="w-16 rounded-full border-2 border-primary bg-primary text-primary-content flex items-center justify-center">
-              <span className="text-2xl font-bold">{user?.username?.[0]?.toUpperCase() || '?'}</span>
+              <img 
+              src={`https://ui-avatars.com/api/?name=${user?.username}&background=0D8ABC&color=fff`}
+              alt={user?.username}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+  e.target.src = `https://ui-avatars.com/api/?name=${user?.username}&background=0D8ABC&color=fff`
+}}
+            />
             </div>
           </div>
           <div>
@@ -170,7 +177,7 @@ export default function Dashboard() {
 
         {/* Main Overview Card */}
         <div className="lg:col-span-2 card bg-base-200 shadow-lg">
-          <div className="card-body bg-primary text-primary-content pb-6">
+          <div className="card-body bg-primary text-primary-content pb-1">
             <div className="flex items-center gap-2">
               <LayoutDashboard className="w-6 h-6" />
               <h2 className="card-title text-2xl font-bold">
