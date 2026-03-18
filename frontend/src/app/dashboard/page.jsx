@@ -116,14 +116,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 p-6 lg:p-10 space-y-8 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-base-100 to-base-200 p-6 lg:p-10 space-y-8 max-w-7xl mx-auto">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="avatar">
-            <div className="w-16 rounded-full border-2 border-primary bg-primary text-primary-content flex items-center justify-center">
-              <img 
+<div className="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">              <img 
               src={`https://ui-avatars.com/api/?name=${user?.username}&background=0D8ABC&color=fff`}
               alt={user?.username}
               className="w-full h-full object-cover"
@@ -135,8 +134,9 @@ export default function Dashboard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-4xl font-bold">Dashboard</h1>
-              <div className="badge badge-primary uppercase">
+<h1 className="text-4xl font-extrabold tracking-tight">
+  Dashboard
+</h1>              <div className="badge badge-primary badge-lg uppercase font-bold">
                 {user?.role || 'loading'}
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function Dashboard() {
         
         {user?.role === "student" && (
           <Link href="/complaints">
-            <button className="btn btn-primary btn-lg gap-2">
+            <button className="btn btn-primary btn-lg gap-2 shadow-md hover:shadow-xl transition">
               <PlusCircle className="w-4 h-4" />
               File New Complaint
             </button>
@@ -157,7 +157,7 @@ export default function Dashboard() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat) => (
-          <div key={stat.label} className="card bg-base-200 shadow-lg">
+          <div key={stat.label} className="card bg-base-100 shadow-md border border-base-300 hover:shadow-xl transition">
             <div className="card-body p-6 flex flex-row items-center justify-between">
               <div>
                 <p className="text-xs font-bold text-base-content/60 uppercase tracking-wider">
@@ -165,7 +165,7 @@ export default function Dashboard() {
                 </p>
                 <p className="text-3xl font-bold mt-1">{stat.value}</p>
               </div>
-              <div className="p-3 rounded-lg bg-base-100">
+              <div className="p-3 rounded-xl bg-base-200 shadow-inner">
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
             </div>
@@ -177,10 +177,10 @@ export default function Dashboard() {
 
         {/* Main Overview Card */}
         <div className="lg:col-span-2 card bg-base-200 shadow-lg">
-          <div className="card-body bg-primary text-primary-content pb-1">
+          <div className="card-body bg-gradient-to-r from-primary to-secondary/40 text-primary-content pb-3">
             <div className="flex items-center gap-2">
               <LayoutDashboard className="w-6 h-6" />
-              <h2 className="card-title text-2xl font-bold">
+              <h2 className="card-title text-2xl font-extrabold tracking-wide">
                 {user.role === 'worker' ? 'Assigned Tasks' : 'Recent Complaints'}
               </h2>
             </div>
@@ -232,7 +232,7 @@ export default function Dashboard() {
               <div className="space-y-2 mt-3">
                 {getRoleActions().map((action) => (
                   <Link key={action.label} href={action.href}>
-                    <button className="btn btn-outline w-full justify-start gap-3 border-base-300">
+                    <button className="btn btn-outline btn-sm hover:btn-primary w-full justify-start gap-3 border-base-300">
                       <action.icon className="w-4 h-4" />
                       {action.label}
                     </button>
@@ -244,8 +244,8 @@ export default function Dashboard() {
 
           {/* IIT Jodhpur Notice Banner */}
           <div className="card bg-base-200 shadow-lg overflow-hidden">
-            <div className="card-body bg-gradient-to-br from-base-300 to-base-200 p-6">
-              <div className="badge badge-primary mb-2">OFFICIAL NOTICE</div>
+            <div className="card-body bg-gradient-to-br from-primary/20 to-secondary/20 p-6 backdrop-blur">
+              <div className="badge badge-secondary badge-sm mb-2">OFFICIAL NOTICE</div>
               <h3 className="font-bold text-xl uppercase">H10 Network Maintenance</h3>
               <p className="text-sm text-base-content/70 mt-2">
                 Downtime expected tomorrow from 2 PM to 4 PM for router upgrades.

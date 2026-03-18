@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MessageSquare, LayoutDashboard, ShieldCheck, Building2 } from "lucide-react"
+import { MessageSquare, LayoutDashboard, ShieldCheck } from "lucide-react"
 
 export default function Home() {
   const features = [
@@ -24,16 +24,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-base-100">
-      {/* Header */}
-      <header className="navbar bg-base-100 shadow-lg">
-        <div className="flex-1">
-          <div className="btn btn-ghost text-xl normal-case font-bold">
-            <Building2 className="w-6 h-6" />
-            HostelOps
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
