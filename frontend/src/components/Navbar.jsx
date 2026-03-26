@@ -112,7 +112,7 @@ export default function Navbar() {
     <nav className="navbar bg-base-200 shadow-lg sticky top-0 z-40">
       {/* Brand */}
       <div className="flex-1">
-        <Link href="/" className="px-4 text-xl font-bold hover:opacity-80 transition">
+        <Link href="/dashboard" className="px-4 text-xl font-bold hover:opacity-80 transition">
           HostelOps
         </Link>
       </div>

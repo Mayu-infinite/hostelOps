@@ -207,9 +207,10 @@ export default function Dashboard() {
                         </p>
                       </div>
                     </div>
-                    <button className="btn btn-ghost btn-sm">
+                    <Link href={`/complaints/${complaint.id}`} className="btn btn-primary btn-sm gap-2">
+                      <ChevronRight className="w-4 h-4" />
                       {user?.role === 'worker' ? 'Update Status' : 'View Details'}
-                    </button>
+                    </Link>
                   </div>
                 ))}
                 <Link href="/complaints" className="flex items-center justify-center p-4 text-xs font-bold uppercase tracking-widest hover:bg-base-100 transition-colors border-t border-base-300 text-base-content/60 hover:text-primary">

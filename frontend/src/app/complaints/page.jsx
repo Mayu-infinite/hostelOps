@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import api from "@/lib/api"
 import { 
   Plus, 
@@ -258,6 +259,11 @@ export default function Complaints() {
                   </div>
                   <span className="text-xs text-base-content/50 font-mono">ID: #{c.id}</span>
                 </div>
+
+                <Link href={`/complaints/${c.id}`} className="btn btn-primary btn-sm gap-2 mt-4 w-full">
+                  <ChevronRight className="w-4 h-4" />
+                  View Details
+                </Link>
               </div>
             </div>
           )) : (

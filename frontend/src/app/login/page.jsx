@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
 import { GoogleLogin } from "@react-oauth/google"
@@ -8,6 +8,14 @@ import { Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
 
 export default function AuthPage() {
   const router = useRouter()
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("access_token")
+    if (token) {
+      router.push("/dashboard")
+    }
+  }, [])
 
   const [mode, setMode] = useState("login")
   const [username, setUsername] = useState("")
