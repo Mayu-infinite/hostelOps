@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import api from "@/lib/api"
+import CloudinaryUpload from "@/components/CloudinaryUpload"
 import {
   ArrowLeft,
   Plus,
@@ -203,25 +204,39 @@ export default function NewComplaintPage() {
               </label>
             </div>
 
-            {/* Image URL Field (Optional) */}
+            {/* Image Upload Field (Optional) */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-bold text-lg">Image URL (Optional)</span>
+                <span className="label-text font-bold text-lg">Attach Photo (Optional)</span>
                 <span className="badge badge-sm badge-outline">Optional</span>
               </label>
-              <input
-                type="url"
-                name="image_url"
-                placeholder="https://example.com/image.jpg"
-                className="input input-bordered input-lg bg-base-100 focus:input-primary"
-                value={formData.image_url}
-                onChange={handleChange}
+              <CloudinaryUpload
+                onUpload={(imageUrl) => {
+                  setFormData(prev => ({ ...prev, image_url: imageUrl }))
+                  addToast("✓ Image uploaded successfully!", "success")
+                }}
+                onError={(error) => {
+                  addToast(error, "error")
+                }}
+                className="mt-2"
               />
               <label className="label">
                 <span className="label-text-alt text-xs text-base-content/50">
-                  Add a direct link to an image showing the issue (helps us resolve faster!)
+                  Upload a photo showing the issue (helps us resolve faster!)
                 </span>
               </label>
+              {formData.image_url && (
+                <div className="mt-3 p-3 bg-success/10 rounded-lg flex items-center justify-between">
+                  <span className="text-sm text-success">✓ Image ready to upload</span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, image_url: "" }))}
+                    className="text-sm text-base-content/60 hover:text-base-content underline"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Info Box */}

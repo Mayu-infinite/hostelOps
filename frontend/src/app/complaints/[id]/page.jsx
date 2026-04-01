@@ -143,7 +143,7 @@ export default function ComplaintDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base-100 flex items-center justify-center">
+      <div className="min bg-base-100 flex items-center justify-center">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
     )
@@ -151,7 +151,7 @@ export default function ComplaintDetailPage() {
 
   if (!complaint) {
     return (
-      <div className="min-h-screen bg-base-100 p-6 flex items-center justify-center">
+      <div className="bg-base-100 p-6 flex items-center justify-center">
         <div className="text-center space-y-4">
           <AlertCircle className="w-16 h-16 mx-auto text-error" />
           <p className="text-lg font-bold">Complaint not found</p>
@@ -165,7 +165,7 @@ export default function ComplaintDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 p-6 lg:p-10 max-w-5xl mx-auto space-y-8">
+    <div className="bg-base-100 p-6 lg:p-10 max-w-5xl mx-auto space-y-8">
 
       {/* Toast Container */}
       <div className="fixed bottom-4 right-4 space-y-2 z-50">
