@@ -193,7 +193,7 @@ export default function Complaints() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 p-6 lg:p-10 max-w-7xl mx-auto space-y-8">
+    <div className="bg-base-100 p-6 lg:p-10 max-w-7xl mx-auto space-y-8">
       
       {/* Toast Container */}
       <div className="fixed bottom-4 right-4 space-y-2 z-50">
