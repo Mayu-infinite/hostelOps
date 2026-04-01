@@ -9,12 +9,10 @@ import {
   Plus,
   Loader2,
   AlertCircle,
-  CheckCircle2,
   Wrench,
   Zap,
   Brush,
   Network,
-  AlertInfo
 } from "lucide-react"
 
 const CATEGORIES = [
@@ -23,7 +21,7 @@ const CATEGORIES = [
   { value: "cleanliness", label: "Cleanliness", icon: Brush, description: "Cleaning, maintenance" },
   { value: "network", label: "Network", icon: Network, description: "WiFi, connectivity" },
   { value: "furniture", label: "Furniture", icon: AlertCircle, description: "Beds, tables, chairs" },
-  { value: "other", label: "Other", icon: AlertInfo, description: "Everything else" },
+  { value: "other", label: "Other", icon: AlertCircle, description: "Everything else" },
 ]
 
 export default function NewComplaintPage() {
@@ -92,7 +90,7 @@ export default function NewComplaintPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 p-4 md:p-6 lg:p-10">
+    <div className="bg-base-100 p-4 md:p-6 lg:p-10">
       {/* Toast Container */}
       <div className="fixed bottom-4 right-4 space-y-2 z-50">
         {toasts.map(toast => (

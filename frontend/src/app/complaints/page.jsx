@@ -46,8 +46,11 @@ export default function Complaints() {
   const [complaints, setComplaints] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [notification, setNotification] = useState({ show: false, message: "", type: "" })
+  const [toasts, setToasts] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteComplaintId, setDeleteComplaintId] = useState(null)
+  const [deleting, setDeleting] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
@@ -78,7 +81,7 @@ export default function Complaints() {
       const res = await api.get(endpoint)
       setComplaints(Array.isArray(res.data) ? res.data : [])
     } catch (err) {
-      showNotification("Failed to load complaints", "error")
+      addToast("Failed to load complaints", "error")
     } finally {
       setLoading(false)
     }
@@ -97,19 +100,37 @@ export default function Complaints() {
       const res = await api.get(endpoint)
       setComplaints(Array.isArray(res.data) ? res.data : []) 
     } catch (err) {
-      showNotification("Failed to load complaints", "error")
+      addToast("Failed to load complaints", "error")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDelete = async (id) => {
+  const addToast = (message, type) => {
+    const id = Date.now()
+    const newToast = { id, message, type }
+    setToasts(prev => [...prev, newToast])
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, 3000)
+  }
+
+  const handleDelete = (id) => {
+    setDeleteComplaintId(id)
+    setDeleteModalOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    setDeleting(true)
     try {
-      await api.delete(`/api/v1/complaints/${id}`)
-      showNotification("Complaint deleted successfully", "success")
-      setComplaints(complaints.filter(c => c.id !== id))
+      await api.delete(`/api/v1/complaints/${deleteComplaintId}`)
+      addToast("Complaint deleted successfully!", "success")
+      setComplaints(complaints.filter(c => c.id !== deleteComplaintId))
+      setDeleteModalOpen(false)
     } catch (err) {
-      showNotification("Deletion failed: Permission denied", "error")
+      addToast(err.response?.data?.detail || "Failed to delete complaint", "error")
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -124,13 +145,13 @@ export default function Complaints() {
 
     try {
       if (formData.title.trim().length < 3) {
-        showNotification("Title must be at least 3 characters", "error")
+        addToast("Title must be at least 3 characters", "error")
         setSubmitting(false)
         return
       }
 
       if (formData.description.trim().length < 10) {
-        showNotification("Description must be at least 10 characters", "error")
+        addToast("Description must be at least 10 characters", "error")
         setSubmitting(false)
         return
       }
@@ -143,7 +164,7 @@ export default function Complaints() {
       }
 
       await api.post("/api/v1/complaints", payload)
-      showNotification("Complaint filed successfully!", "success")
+      addToast("Complaint filed successfully!", "success")
       
       setFormData({
         title: "",
@@ -154,15 +175,10 @@ export default function Complaints() {
       setModalOpen(false)
       fetchComplaints()
     } catch (err) {
-      showNotification(err.response?.data?.detail || "Failed to file complaint", "error")
+      addToast(err.response?.data?.detail || "Failed to file complaint", "error")
     } finally {
       setSubmitting(false)
     }
-  }
-
-  const showNotification = (message, type) => {
-    setNotification({ show: true, message, type })
-    setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000)
   }
 
   const closeModal = () => {
@@ -178,10 +194,53 @@ export default function Complaints() {
   return (
     <div className="min-h-screen bg-base-100 p-6 lg:p-10 max-w-7xl mx-auto space-y-8">
       
-      {/* Notification */}
-      {notification.show && (
-        <div className={`alert alert-${notification.type === 'error' ? 'error' : 'success'}`}>
-          <span>{notification.message}</span>
+      {/* Toast Container */}
+      <div className="fixed bottom-4 right-4 space-y-2 z-50">
+        {toasts.map(toast => (
+          <div key={toast.id} className={`alert alert-${toast.type === 'error' ? 'error' : 'success'} shadow-lg`}>
+            <span>{toast.message}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-base-100 rounded-lg shadow-2xl p-6 max-w-sm w-full space-y-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <AlertCircle className="w-6 h-6 text-error" />
+              Delete Complaint?
+            </h2>
+            <p className="text-base-content/70">
+              This action cannot be undone. The complaint will be permanently deleted.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="btn btn-ghost flex-1"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="btn btn-error flex-1 gap-2"
+                disabled={deleting}
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
       
