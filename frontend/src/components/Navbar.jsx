@@ -98,7 +98,7 @@ export default function Navbar() {
     } else if (user.role === "warden") {
       return [
         ...baseLinks,
-        { label: "Approvals", href: "/approvals", icon: Settings },
+        { label: "Warden Panel", href: "/dashboard/warden", icon: Settings },
       ]
     } else if (user.role === "admin") {
       return [

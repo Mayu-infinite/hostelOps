@@ -6,15 +6,35 @@ import axios from "axios"
 import { GoogleLogin } from "@react-oauth/google"
 import { Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-react"
 
+const routeByRole = async (token, router) => {
+  try {
+    const meRes = await axios.get("http://127.0.0.1:8000/api/v1/auth/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const role = meRes.data?.role
+    if (role === "warden") {
+      router.push("/dashboard/warden")
+      return
+    }
+
+    router.push("/dashboard")
+  } catch (err) {
+    console.error("Failed to determine role for redirect:", err)
+    router.push("/dashboard")
+  }
+}
+
 export default function AuthPage() {
   const router = useRouter()
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
     const token = localStorage.getItem("access_token")
-    if (token) {
-      router.push("/dashboard")
-    }
+    if (!token) return
+    routeByRole(token, router)
   }, [])
 
   const [mode, setMode] = useState("login")
@@ -54,7 +74,7 @@ export default function AuthPage() {
       
       setSuccess(mode === "login" ? "Welcome back!" : "Account created!")
       setTimeout(() => {
-        router.push("/dashboard")
+        routeByRole(access_token, router)
       }, 1000)
     } catch (err) {
       setError(err.response?.data?.detail || "Authentication failed")
@@ -80,7 +100,7 @@ export default function AuthPage() {
       }
       setSuccess("Login successful!")
       setTimeout(() => {
-        router.push("/dashboard")
+        routeByRole(access_token, router)
       }, 1000)
     } catch (err) {
       setError(err.response?.data?.detail || "Google login failed")

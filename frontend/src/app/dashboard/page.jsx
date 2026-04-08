@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   PlusCircle,
   History,
@@ -21,6 +22,7 @@ import {
 import api from "@/lib/api"
 
 export default function Dashboard() {
+  const router = useRouter()
   const [user, setUser] = useState(null)
   const [stats, setStats] = useState([
     { label: "Active Complaints", value: "0", icon: AlertCircle, color: "text-amber-500" },
@@ -39,6 +41,13 @@ export default function Dashboard() {
       // Fetch current user
       const userRes = await api.get("/api/v1/auth/me")
       const userData = userRes.data
+
+      // Send wardens to their dedicated dashboard.
+      if (userData.role === "warden") {
+        router.replace("/dashboard/warden")
+        return
+      }
+
       setUser(userData)
 
       // Fetch complaints based on user role
